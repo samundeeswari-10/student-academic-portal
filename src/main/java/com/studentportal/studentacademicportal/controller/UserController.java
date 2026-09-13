@@ -1,22 +1,31 @@
 package com.studentportal.studentacademicportal.controller;
 
+
 import com.studentportal.studentacademicportal.entity.User;
 import com.studentportal.studentacademicportal.service.UserService;
 import org.springframework.web.bind.annotation.*;
 import com.studentportal.studentacademicportal.dto.LoginRequest;
 import org.springframework.http.ResponseEntity;
-import com.studentportal.studentacademicportal.dto.LoginResponse;
 import java.util.Optional;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+
 
 @RestController
 public class UserController {
 
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
-    public UserController(UserService userService) {
+//    public UserController(UserService userService) {
+//        this.userService = userService;
+//    }
+    public UserController(UserService userService,
+                          AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
-
     @PostMapping("/api/users")
     public User createUser(@RequestBody User user) {
         return userService.saveUser(user);
@@ -42,25 +51,21 @@ public class UserController {
     @PostMapping("/api/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 
-        Optional<User> user = userService.login(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        );
+        try {
 
-        if (user.isPresent()) {
-
-            User loggedInUser = user.get();
-
-            LoginResponse response = new LoginResponse(
-                    loggedInUser.getId(),
-                    loggedInUser.getName(),
-                    loggedInUser.getEmail(),
-                    loggedInUser.getRole()
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
             );
 
-            return ResponseEntity.ok(response);
-        }
+            return ResponseEntity.ok(authentication.getName());
 
-        return ResponseEntity.status(401).body("Invalid email or password");
+        } catch (Exception e) {
+
+            return ResponseEntity.status(401)
+                    .body("Invalid email or password");
+        }
     }
 }
