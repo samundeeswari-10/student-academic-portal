@@ -18,6 +18,15 @@ public class Student {
 
     private String name;
     private String email;
+    private String studentId;
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
 
     public String getDepartment() {
         return department;

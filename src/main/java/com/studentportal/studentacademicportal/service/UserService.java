@@ -1,7 +1,9 @@
 
 package com.studentportal.studentacademicportal.service;
 import java.util.Optional;
+
 import com.studentportal.studentacademicportal.entity.User;
+import com.studentportal.studentacademicportal.exception.EmailAlreadyExistsException;
 import com.studentportal.studentacademicportal.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class UserService {
     }
 
     public User saveUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already registered");        }
 
         String encodedPassword =
                 passwordEncoder.encode(user.getPassword());
@@ -39,5 +43,11 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 }
