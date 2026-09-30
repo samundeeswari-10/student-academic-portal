@@ -7,6 +7,13 @@ import com.studentportal.studentacademicportal.repository.DepartmentRepository;
 import com.studentportal.studentacademicportal.repository.SubjectRepository;
 import com.studentportal.studentacademicportal.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import com.studentportal.studentacademicportal.entity.Assignment;
+import com.studentportal.studentacademicportal.repository.AssignmentRepository;
+import com.studentportal.studentacademicportal.repository.AssignmentSubmissionRepository;
+import com.studentportal.studentacademicportal.repository.AttendanceRepository;
+import com.studentportal.studentacademicportal.repository.EnrollmentRepository;
+import com.studentportal.studentacademicportal.repository.MarkRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,15 +24,30 @@ public class SubjectService {
     private final SubjectRepository subjectRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final MarkRepository markRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final AssignmentRepository assignmentRepository;
+    private final AssignmentSubmissionRepository assignmentSubmissionRepository;
 
     public SubjectService(
             SubjectRepository subjectRepository,
             DepartmentRepository departmentRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            AttendanceRepository attendanceRepository,
+            MarkRepository markRepository,
+            EnrollmentRepository enrollmentRepository,
+            AssignmentRepository assignmentRepository,
+            AssignmentSubmissionRepository assignmentSubmissionRepository) {
 
         this.subjectRepository = subjectRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
+        this.attendanceRepository = attendanceRepository;
+        this.markRepository = markRepository;
+        this.enrollmentRepository = enrollmentRepository;
+        this.assignmentRepository = assignmentRepository;
+        this.assignmentSubmissionRepository = assignmentSubmissionRepository;
     }
 
     public Subject createSubject(
@@ -105,13 +127,43 @@ public class SubjectService {
         return subjectRepository.save(subject);
     }
 
+    @Transactional
     public boolean deleteSubject(Long id) {
 
         if (!subjectRepository.existsById(id)) {
             return false;
         }
 
+        // 1. Delete attendance records
+        attendanceRepository
+                .deleteAll(attendanceRepository.findBySubjectId(id));
+
+        // 2. Delete marks
+        markRepository
+                .deleteAll(markRepository.findBySubjectId(id));
+
+        // 3. Delete enrollments
+        enrollmentRepository
+                .deleteAll(enrollmentRepository.findBySubjectId(id));
+
+        // 4. Delete assignment submissions
+        List<Assignment> assignments =
+                assignmentRepository.findBySubjectId(id);
+
+        for (Assignment assignment : assignments) {
+            assignmentSubmissionRepository
+                    .deleteAll(
+                            assignmentSubmissionRepository
+                                    .findByAssignmentId(assignment.getId())
+                    );
+        }
+
+        // 5. Delete assignments
+        assignmentRepository.deleteAll(assignments);
+
+        // 6. Finally delete the subject
         subjectRepository.deleteById(id);
+
         return true;
     }
 }

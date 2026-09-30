@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="dashboard-page">
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">SP</div>
+            <span>Student Portal</span>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="#" class="nav-item active">
+                🏠
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                👤
+                <span>Profile</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                📚
+                <span>Subjects</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                📝
+                <span>Assignments</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                📊
+                <span>Performance</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                📅
+                <span>Attendance</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                🔔
+                <span>Notifications</span>
+            </a>
+
+        </nav>
+
+        <button
+                class="logout-button"
+                onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-main">
+
+        <header class="dashboard-header">
+
+            <div>
+                <h1>Dashboard</h1>
+
+                <p>
+                    Here's your academic overview.
+                </p>
+            </div>
+
+            <div class="student-header">
+
+                <div class="student-avatar">
+                    S
+                </div>
+
+                <div>
+                    <strong id="headerStudentName">
+                        Student
+                    </strong>
+
+                    <span id="headerStudentRole">
+                        STUDENT
+                    </span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- WELCOME -->
+
+        <section class="welcome-section">
+
+            <h2>
+                Welcome back,
+                <span id="studentName">Student</span> 👋
+            </h2>
+
+            <p>
+                Keep track of your academic progress and stay
+                on top of your studies.
+            </p>
+
+        </section>
+
+
+        <!-- STAT CARDS -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📈
+                </div>
+
+                <div>
+                    <p>Marks Average</p>
+
+                    <h3 id="marksAverage">
+                        --
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📅
+                </div>
+
+                <div>
+                    <p>Attendance</p>
+
+                    <h3 id="attendancePercentage">
+                        --
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <div>
+                    <p>Subjects</p>
+
+                    <h3 id="subjectCount">
+                        --
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⚠️
+                </div>
+
+                <div>
+                    <p>Academic Risk</p>
+
+                    <h3 id="academicRisk">
+                        --
+                    </h3>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CONTENT GRID -->
+
+        <section class="dashboard-content">
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <h2>Subject Performance</h2>
+
+                    <span>Overview</span>
+
+                </div>
+
+                <div id="subjectPerformance">
+
+                    <p class="loading">
+                        Loading performance...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <h2>Notifications</h2>
+
+                    <span>Recent</span>
+
+                </div>
+
+                <div id="notifications">
+
+                    <p class="loading">
+                        Loading notifications...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

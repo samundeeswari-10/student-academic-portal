@@ -1,7 +1,7 @@
 
 package com.studentportal.studentacademicportal.service;
 import java.util.Optional;
-
+import java.util.List;
 import com.studentportal.studentacademicportal.entity.User;
 import com.studentportal.studentacademicportal.exception.EmailAlreadyExistsException;
 import com.studentportal.studentacademicportal.repository.UserRepository;
@@ -43,6 +43,9 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+    public List<User> getUsersByRole(String role) {
+        return userRepository.findByRole(role);
     }
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);

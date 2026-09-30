@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Academic Portal - Login</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="login-page">
+
+<div class="login-container">
+
+    <div class="login-left">
+
+        <div class="brand">
+            <div class="brand-logo">SP</div>
+            <span>Student Portal</span>
+        </div>
+
+        <div class="login-content">
+
+            <h1>Welcome back</h1>
+
+            <p class="subtitle">
+                Sign in to access your academic dashboard.
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+
+                    <input
+                            type="email"
+                            id="email"
+                            placeholder="Enter your email"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <input
+                            type="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            required
+                    >
+                </div>
+
+                <div class="login-options">
+
+                    <label class="remember">
+                        <input type="checkbox">
+                        Remember me
+                    </label>
+
+                    <a href="#" class="forgot-password">
+                        Forgot password?
+                    </a>
+
+                </div>
+
+                <button type="submit" class="primary-button">
+                    Sign In
+                </button>
+
+                <p id="loginMessage" class="message"></p>
+
+            </form>
+
+            <p class="register-text">
+                Don't have an account?
+                <a href="#">Register</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="login-right">
+
+        <div class="welcome-card">
+
+            <div class="welcome-icon">
+                🎓
+            </div>
+
+            <h2>Manage your academic journey</h2>
+
+            <p>
+                Track your subjects, marks, attendance,
+                assignments and academic performance in one place.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/login.js"></script>
+
+</body>
+</html>

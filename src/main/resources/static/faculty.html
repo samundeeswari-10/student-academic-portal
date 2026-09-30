@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Faculty</title>
+
+    <link rel="stylesheet" href="css/students.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>Student Portal</h2>
+
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="students.html">Students</a>
+    <a href="faculty.html">Faculty</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="assignments.html">Assignments</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="marks.html">Marks</a>
+
+    <button onclick="logout()">Logout</button>
+
+</div>
+
+
+<div class="main">
+
+    <div class="topbar">
+
+        <div>
+            <h1>Manage Faculty</h1>
+            <p>View and manage faculty records</p>
+        </div>
+
+        <button
+                class="add-btn"
+                onclick="showAddFaculty()">
+
+            + Add Faculty
+
+        </button>
+
+    </div>
+
+
+    <!-- FACULTY FORM -->
+
+    <div
+            id="facultyFormContainer"
+            style="display:none;">
+
+        <h2 id="facultyFormTitle">
+            Add Faculty
+        </h2>
+
+        <form id="facultyForm">
+
+            <input
+                    type="text"
+                    id="facultyName"
+                    placeholder="Faculty Name"
+                    required
+            >
+
+            <input
+                    type="email"
+                    id="facultyEmail"
+                    placeholder="Email"
+                    required
+            >
+
+            <input
+                    type="text"
+                    id="facultyDepartment"
+                    placeholder="Department"
+                    required
+            >
+
+            <input
+                    type="text"
+                    id="facultyDesignation"
+                    placeholder="Designation"
+                    required
+            >
+
+            <button
+                    type="submit"
+                    id="saveFacultyButton">
+
+                Save Faculty
+
+            </button>
+
+            <button
+                    type="button"
+                    onclick="hideFacultyForm()">
+
+                Cancel
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- FACULTY TABLE -->
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Actions</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody id="facultyTableBody">
+
+            <tr>
+
+                <td colspan="6">
+                    Loading faculty...
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script src="js/faculty.js"></script>
+
+</body>
+
+</html>

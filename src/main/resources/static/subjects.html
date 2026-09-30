@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management</title>
+
+    <link rel="stylesheet" href="css/students.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>Student Portal</h2>
+
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="students.html">Students</a>
+    <a href="faculty.html">Faculty</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="assignments.html">Assignments</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="marks.html">Marks</a>
+
+    <button onclick="logout()">Logout</button>
+
+</div>
+
+
+<div class="main-content">
+
+    <div class="page-header">
+
+        <div>
+            <h1>Subject Management</h1>
+            <p>Manage subjects, departments and faculty assignments.</p>
+        </div>
+
+        <button class="add-button" onclick="showAddSubject()">
+            + Add Subject
+        </button>
+
+    </div>
+
+
+    <!-- Subject Form -->
+
+    <div id="subjectFormContainer" class="form-container" style="display: none;">
+
+        <h2 id="subjectFormTitle">Add Subject</h2>
+
+        <form id="subjectForm">
+
+            <div class="form-group">
+                <label>Subject Name</label>
+                <input
+                        type="text"
+                        id="subjectName"
+                        placeholder="Enter subject name"
+                        required>
+            </div>
+
+
+            <div class="form-group">
+                <label>Subject Code</label>
+                <input
+                        type="text"
+                        id="subjectCode"
+                        placeholder="Enter subject code"
+                        required>
+            </div>
+
+
+            <div class="form-group">
+                <label>Credits</label>
+                <input
+                        type="number"
+                        id="subjectCredits"
+                        min="1"
+                        required>
+            </div>
+
+
+            <div class="form-group">
+                <label>Department</label>
+
+                <select id="departmentId" required>
+                    <option value="">Select Department</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+                <label>Faculty</label>
+
+                <select id="facultyId" required>
+                    <option value="">Select Faculty</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button type="submit" id="saveSubjectButton">
+                    Save Subject
+                </button>
+
+                <button
+                        type="button"
+                        onclick="hideSubjectForm()">
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- Subject Table -->
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Credits</th>
+                <th>Department</th>
+                <th>Faculty</th>
+                <th>Actions</th>
+            </tr>
+
+            </thead>
+
+            <tbody id="subjectTableBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script src="js/subjects.js"></script>
+
+</body>
+</html>

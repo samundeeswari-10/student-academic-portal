@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
+        System.out.println("JWT FILTER HIT: " + request.getRequestURI());
 
         String authHeader = request.getHeader("Authorization");
 
@@ -54,6 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UserDetails userDetails =
                         userDetailsService.loadUserByUsername(email);
+
+                System.out.println("JWT USER: " + userDetails.getUsername());
+                System.out.println("JWT AUTHORITIES: " + userDetails.getAuthorities());
 
                 if (jwtService.isTokenValid(token, userDetails)) {
 
@@ -76,8 +80,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            // Invalid or expired JWT.
-            // The request continues without authentication.
+            System.out.println("JWT ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
 
         filterChain.doFilter(request, response);

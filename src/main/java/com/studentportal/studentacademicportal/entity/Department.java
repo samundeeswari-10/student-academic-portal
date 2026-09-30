@@ -1,5 +1,6 @@
 package com.studentportal.studentacademicportal.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class Department {
     @Column(nullable = false, unique = true)
     private String code;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "department")
     private List<Subject> subjects = new ArrayList<>();
 

@@ -1,15 +1,21 @@
 package com.studentportal.studentacademicportal.config;
 
 import com.studentportal.studentacademicportal.security.JwtAuthenticationFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @EnableMethodSecurity
 @Configuration
@@ -17,13 +23,16 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
+
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -35,10 +44,24 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // Public endpoints
                         .requestMatchers(
                                 "/api/login",
-                                "/api/users"
+                                "/api/users",
+                                "/login.html",
+                                "/dashboard.html",
+                                "/admin-dashboard.html",
+                                "/students.html",
+                                "/faculty.html",
+                                "/subjects.html",
+                                "/css/**",
+                                "/js/**",
+                                "/favicon.ico"
                         ).permitAll()
+
+                        .requestMatchers("/api/students/**").hasRole("ADMIN")
+                        .requestMatchers("/api/subjects/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
@@ -50,6 +73,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(
