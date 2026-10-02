@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/students.css">
+</head>
+<body>
+<div class="sidebar">
+    <h2>Student Portal</h2>
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="students.html">Students</a>
+    <a href="faculty.html">Faculty</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="assignments.html">Assignments</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="marks.html">Marks</a>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div class="main-content">
+    <h1>Attendance Management</h1>
+    <p>Mark attendance and track student attendance records.</p>
+
+    <button type="button" onclick="showAttendanceForm()">
+        + Mark Attendance
+    </button>
+
+    <div id="attendanceFormContainer" style="display: none;">
+        <h2 id="formTitle">Mark Attendance</h2>
+
+        <form id="attendanceForm">
+            <label for="student">Student</label>
+            <select id="student" required>
+                <option value="">Select Student</option>
+            </select>
+
+            <label for="subject">Subject</label>
+            <select id="subject" required>
+                <option value="">Select Subject</option>
+            </select>
+
+            <label for="attendanceDate">Date</label>
+            <input type="date" id="attendanceDate" required>
+
+            <label for="present">Attendance Status</label>
+            <select id="present" required>
+                <option value="true">Present</option>
+                <option value="false">Absent</option>
+            </select>
+
+            <button type="submit">Save Attendance</button>
+            <button type="button" onclick="hideAttendanceForm()">
+                Cancel
+            </button>
+        </form>
+    </div>
+
+    <p id="attendanceMessage"></p>
+
+    <h2>Attendance History</h2>
+
+    <label for="filterSubject">View by Subject</label>
+    <select id="filterSubject">
+        <option value="">Select Subject</option>
+    </select>
+    <button type="button" onclick="loadAttendance()">
+        View Attendance
+    </button>
+
+    <div id="percentageContainer" style="margin: 15px 0;"></div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="attendanceTableBody">
+            <tr>
+                <td colspan="6">Select a subject to view attendance.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="js/attendance.js"></script>
+</body>
+</html>

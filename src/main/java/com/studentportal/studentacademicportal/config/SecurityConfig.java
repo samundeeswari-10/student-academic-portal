@@ -53,8 +53,10 @@ public class SecurityConfig {
                                 "/dashboard.html",
                                 "/admin-dashboard.html",
                                 "/students.html",
+                                "/attendance.html",
                                 "/faculty.html",
                                 "/subjects.html",
+                                "/assignments.html",
                                 "/css/**",
                                 "/js/**",
                                 "/favicon.ico"
