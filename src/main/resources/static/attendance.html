@@ -1,99 +1,467 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Management</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/students.css">
+    <title>Attendance History | Student Portal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #EBF4F6;
+            color: #09637E;
+        }
+
+        /* Main layout */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            min-height: 100vh;
+            background: #151c27;
+            color: white;
+            padding: 24px 16px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 35px;
+            padding: 0 8px;
+        }
+
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #088395;
+            border-radius: 8px;
+            font-size: 17px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 13px 12px;
+            border-radius: 8px;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: #088395;
+            color: white;
+        }
+
+        .sidebar-nav a.active {
+            background: #088395;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            color: #088395;
+        }
+
+        .subtitle {
+            color: #52666d;
+        }
+
+        .back-link {
+            color: #088395;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Attendance summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .summary-item {
+            background: #e2f0f3;
+            padding: 18px;
+            border-radius: 10px;
+        }
+
+        .summary-item p {
+            color: #52666d;
+            margin: 0 0 10px;
+        }
+
+        .summary-item h2 {
+            color: #09637E;
+            margin: 0;
+        }
+
+        /* Subject summary */
+        .subject-summary {
+            margin: 25px 0;
+        }
+
+        .subject-card {
+            padding: 16px;
+            margin: 12px 0;
+            background: #EBF4F6;
+            border: 1px solid #c8e0e5;
+            border-radius: 10px;
+        }
+
+        .subject-card h4 {
+            margin: 0 0 8px;
+            color: #09637E;
+        }
+
+        .subject-card p {
+            margin: 0;
+            color: #52666d;
+        }
+
+        .subject-progress {
+            height: 8px;
+            margin-top: 12px;
+            background: #d5e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .subject-progress-fill {
+            height: 100%;
+            background: #7AB2B2;
+            border-radius: 10px;
+        }
+
+        /* Filters */
+        .attendance-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0 10px;
+        }
+
+        .filter-btn {
+            padding: 9px 18px;
+            border: 1px solid #088395;
+            border-radius: 8px;
+            background: white;
+            color: #088395;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #088395;
+            color: white;
+        }
+
+        /* Attendance table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #d5e5e9;
+        }
+
+        th {
+            background: #e2f0f3;
+            color: #09637E;
+        }
+
+        .present {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .absent {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        #message {
+            color: #52666d;
+            margin-top: 15px;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 800px) {
+            .app-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+                min-height: auto;
+                padding: 16px;
+            }
+
+            .sidebar-brand {
+                margin-bottom: 16px;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+
+            .sidebar-nav a {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+        }
+
+        /* Contrast-focused text colors */
+        body {
+            color: #000000;
+        }
+
+        .sidebar,
+        .sidebar-brand,
+        .brand-logo,
+        .sidebar-nav a,
+        .sidebar-nav a.active,
+        .sidebar-nav a:hover {
+            color: #ffffff;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        p,
+        label,
+        th,
+        td,
+        .subject-card h4,
+        .summary-item h2 {
+            color: #000000;
+        }
+
+        .back-link,
+        .filter-btn {
+            color: #09637E;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            color: #ffffff;
+            background: #09637E;
+            border-color: #09637E;
+        }
+
+        .subject-progress-fill {
+            background: #09637E;
+        }
+
+        .present {
+            color: #166534;
+        }
+
+        .absent {
+            color: #b91c1c;
+        }
+
+        .subtitle,
+        .summary-item p,
+        .subject-card p,
+        #message {
+            color: #333333;
+        }
+
+    </style>
 </head>
+
 <body>
-<div class="sidebar">
-    <h2>Student Portal</h2>
-    <a href="admin-dashboard.html">Dashboard</a>
-    <a href="students.html">Students</a>
-    <a href="faculty.html">Faculty</a>
-    <a href="subjects.html">Subjects</a>
-    <a href="assignments.html">Assignments</a>
-    <a href="attendance.html">Attendance</a>
-    <a href="marks.html">Marks</a>
-    <button onclick="logout()">Logout</button>
-</div>
 
-<div class="main-content">
-    <h1>Attendance Management</h1>
-    <p>Mark attendance and track student attendance records.</p>
+<div class="app-layout">
 
-    <button type="button" onclick="showAttendanceForm()">
-        + Mark Attendance
-    </button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo">SP</div>
+            <span>Student Portal</span>
+        </div>
 
-    <div id="attendanceFormContainer" style="display: none;">
-        <h2 id="formTitle">Mark Attendance</h2>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html">🏠 Dashboard</a>
+            <a href="profile.html">👤 Profile</a>
+            <a href="subjects.html">📚 Subjects</a>
+            <a href="assignments.html">📝 Assignments</a>
+            <a href="performance.html">📊 Performance</a>
+            <a href="attendance.html" class="active">📅 Attendance</a>
+            <a href="notifications.html">🔔 Notifications</a>
+        </nav>
+    </aside>
 
-        <form id="attendanceForm">
-            <label for="student">Student</label>
-            <select id="student" required>
-                <option value="">Select Student</option>
-            </select>
+    <!-- Main content -->
+    <main class="main-content">
+        <div class="container">
 
-            <label for="subject">Subject</label>
-            <select id="subject" required>
-                <option value="">Select Subject</option>
-            </select>
+            <div class="header">
+                <div>
+                    <h1>Attendance History</h1>
+                    <p class="subtitle">
+                        View your subject-wise attendance records.
+                    </p>
+                </div>
+            </div>
 
-            <label for="attendanceDate">Date</label>
-            <input type="date" id="attendanceDate" required>
+            <section class="card">
+                <h2>My Attendance</h2>
+                <p id="studentName">Loading student...</p>
 
-            <label for="present">Attendance Status</label>
-            <select id="present" required>
-                <option value="true">Present</option>
-                <option value="false">Absent</option>
-            </select>
+                <!-- Overall summary -->
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <p>Overall Attendance</p>
+                        <h2 id="overallPercentage">--%</h2>
+                    </div>
 
-            <button type="submit">Save Attendance</button>
-            <button type="button" onclick="hideAttendanceForm()">
-                Cancel
-            </button>
-        </form>
-    </div>
+                    <div class="summary-item">
+                        <p>Classes Attended</p>
+                        <h2 id="classesAttended">--</h2>
+                    </div>
 
-    <p id="attendanceMessage"></p>
+                    <div class="summary-item">
+                        <p>Total Classes</p>
+                        <h2 id="totalClasses">--</h2>
+                    </div>
+                </div>
 
-    <h2>Attendance History</h2>
+                <!-- Subject-wise summary -->
+                <div class="subject-summary">
+                    <h3>Subject-wise Attendance</h3>
+                    <div id="subjectSummary">
+                        <p>Loading...</p>
+                    </div>
+                </div>
 
-    <label for="filterSubject">View by Subject</label>
-    <select id="filterSubject">
-        <option value="">Select Subject</option>
-    </select>
-    <button type="button" onclick="loadAttendance()">
-        View Attendance
-    </button>
+                <!-- Attendance filters -->
+                <div class="attendance-filters">
+                    <button class="filter-btn active" data-filter="ALL">
+                        All
+                    </button>
 
-    <div id="percentageContainer" style="margin: 15px 0;"></div>
+                    <button class="filter-btn" data-filter="PRESENT">
+                        Present
+                    </button>
 
-    <div class="table-container">
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Student</th>
-                <th>Subject</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="attendanceTableBody">
-            <tr>
-                <td colspan="6">Select a subject to view attendance.</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+                    <button class="filter-btn" data-filter="ABSENT">
+                        Absent
+                    </button>
+                </div>
+
+                <!-- Attendance table -->
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="attendanceTable">
+                        <tr>
+                            <td colspan="3">Loading attendance...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="message"></p>
+            </section>
+
+        </div>
+    </main>
+
 </div>
 
 <script src="js/attendance.js"></script>
+
 </body>
 </html>

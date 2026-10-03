@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marks Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/students.css">
+</head>
+<body>
+<div class="sidebar">
+    <h2>Student Portal</h2>
+    <a href="admin-dashboard.html">Dashboard</a>
+    <a href="students.html">Students</a>
+    <a href="faculty.html">Faculty</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="assignments.html">Assignments</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="marks.html">Marks</a>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div class="main-content">
+    <h1>Marks Management</h1>
+    <p>Record and manage student academic performance.</p>
+
+    <button type="button" onclick="showMarkForm()">+ Add Marks</button>
+
+    <div id="markFormContainer" style="display: none;">
+        <h2 id="formTitle">Add Marks</h2>
+
+        <form id="markForm">
+            <label for="student">Student</label>
+            <select id="student" required>
+                <option value="">Select Student</option>
+            </select>
+
+            <label for="subject">Subject</label>
+            <select id="subject" required>
+                <option value="">Select Subject</option>
+            </select>
+
+            <h3>CAT Exams (each out of 50)</h3>
+
+            <label for="cat1">CAT 1 / 50</label>
+            <input type="number" id="cat1" min="0" max="50"
+                   step="0.5" required>
+
+            <label for="cat2">CAT 2 / 50</label>
+            <input type="number" id="cat2" min="0" max="50"
+                   step="0.5" required>
+
+            <label for="cat3">CAT 3 / 50</label>
+            <input type="number" id="cat3" min="0" max="50"
+                   step="0.5" required>
+
+            <h3>Assignments (each out of 10)</h3>
+
+            <label for="assignment1">Assignment 1 / 10</label>
+            <input type="number" id="assignment1" min="0" max="10"
+                   step="0.5" required>
+
+            <label for="assignment2">Assignment 2 / 10</label>
+            <input type="number" id="assignment2" min="0" max="10"
+                   step="0.5" required>
+
+            <label for="assignment3">Assignment 3 / 10</label>
+            <input type="number" id="assignment3" min="0" max="10"
+                   step="0.5" required>
+
+            <h3>Final Examination</h3>
+
+            <label for="finalExam">Final Exam / 100</label>
+            <input type="number" id="finalExam" min="0" max="100"
+                   step="0.5" required>
+
+            <h3>Calculated Marks</h3>
+
+            <p>CAT Average: <strong id="catAverage">0.00 / 50</strong></p>
+            <p>CAT Score: <strong id="catScore">0.00 / 30</strong></p>
+            <p>Assignment Average: <strong id="assignmentAverage">0.00 / 10</strong></p>
+            <p>Internal Total: <strong id="internalTotal">0.00 / 40</strong></p>
+            <p>Final Exam Converted: <strong id="finalExamConverted">0.00 / 60</strong></p>
+            <p>Overall Total: <strong id="overallTotal">0.00 / 100</strong></p>
+
+            <button type="submit">Save Marks</button>
+            <button type="button" onclick="hideMarkForm()">Cancel</button>
+        </form>
+    </div>
+
+    <p id="markMessage"></p>
+
+    <h2>Marks Records</h2>
+
+    <label for="filterSubject">Filter by Subject</label>
+    <select id="filterSubject">
+        <option value="">Select Subject</option>
+    </select>
+    <button type="button" onclick="loadMarks()">View Marks</button>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>CAT 1 / 50</th>
+                <th>CAT 2 / 50</th>
+                <th>CAT 3 / 50</th>
+                <th>CAT Average / 50</th>
+                <th>Assignment 1 / 10</th>
+                <th>Assignment 2 / 10</th>
+                <th>Assignment 3 / 10</th>
+                <th>Assignment Average / 10</th>
+                <th>Internal / 40</th>
+                <th>Final Exam / 100</th>
+                <th>Final Converted / 60</th>
+                <th>Overall / 100</th>
+                <th>Percentage</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="marksTableBody">
+            <tr>
+                <td colspan="17">Select a subject to view marks.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="js/marks.js"></script>
+</body>
+</html>

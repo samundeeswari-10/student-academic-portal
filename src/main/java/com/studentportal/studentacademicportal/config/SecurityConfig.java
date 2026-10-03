@@ -57,14 +57,15 @@ public class SecurityConfig {
                                 "/faculty.html",
                                 "/subjects.html",
                                 "/assignments.html",
+                                "/marks.html",
                                 "/css/**",
                                 "/js/**",
                                 "/favicon.ico"
                         ).permitAll()
 
                         .requestMatchers("/api/students/**").hasRole("ADMIN")
-                        .requestMatchers("/api/subjects/**").hasRole("ADMIN")
-
+                        .requestMatchers("/api/subjects/**").hasAnyRole("ADMIN", "FACULTY")
+                        .requestMatchers("/api/marks/**").hasAnyRole("ADMIN", "FACULTY")
                         .anyRequest().authenticated()
                 )
 

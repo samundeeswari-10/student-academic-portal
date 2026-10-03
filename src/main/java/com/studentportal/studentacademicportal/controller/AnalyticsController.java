@@ -1,10 +1,11 @@
+
 package com.studentportal.studentacademicportal.controller;
 
 import com.studentportal.studentacademicportal.dto.StudentAnalyticsResponse;
+import com.studentportal.studentacademicportal.dto.TargetTrackingResponse;
 import com.studentportal.studentacademicportal.service.AnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -18,14 +19,23 @@ public class AnalyticsController {
 
     @GetMapping("/student/{studentId}")
     public ResponseEntity<StudentAnalyticsResponse> getStudentAnalytics(
-            @PathVariable Long studentId,
-            Authentication authentication) {
-
-        System.out.println("AUTHENTICATED USER: " + authentication.getName());
-        System.out.println("AUTHORITIES: " + authentication.getAuthorities());
+            @PathVariable Long studentId) {
 
         return ResponseEntity.ok(
                 analyticsService.getStudentAnalytics(studentId)
+        );
+    }
+
+    @GetMapping("/student/{studentId}/target")
+    public ResponseEntity<TargetTrackingResponse> getTargetTracking(
+            @PathVariable Long studentId,
+            @RequestParam double targetPercentage) {
+
+        return ResponseEntity.ok(
+                analyticsService.getTargetTracking(
+                        studentId,
+                        targetPercentage
+                )
         );
     }
 }

@@ -1,286 +1,198 @@
 
-const token = localStorage.getItem("token");
-const role = localStorage.getItem("studentRole");
+const token = localStorage.getItem("studentPortalToken");
+const studentId = localStorage.getItem("studentId");
+const studentName = localStorage.getItem("studentName");
 
-if (!token) {
+let allAttendanceRecords = [];
+let currentFilter = "ALL";
+
+if (!token || !studentId) {
     window.location.href = "login.html";
-}
+} else {
+    document.getElementById("studentName").textContent =
+        studentName || "Student";
 
-let editingAttendanceId = null;
-
-const headers = {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
-};
-
-async function fetchJson(url, options = {}) {
-    const response = await fetch(url, {
-        ...options,
-        headers: { ...headers, ...(options.headers || {}) }
-    });
-
-    if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || `Request failed (${response.status})`);
-    }
-
-    if (response.status === 204) return null;
-    return response.json();
-}
-
-async function loadStudents() {
-    const students = await fetchJson("/api/students");
-    const select = document.getElementById("student");
-
-    select.innerHTML = '<option value="">Select Student</option>';
-
-    students.forEach(student => {
-        const option = document.createElement("option");
-        option.value = student.id;
-        option.textContent = `${student.name} (ID: ${student.id})`;
-        select.appendChild(option);
-    });
-}
-
-async function loadSubjects() {
-    const subjects = await fetchJson("/api/subjects");
-
-    ["subject", "filterSubject"].forEach(selectId => {
-        const select = document.getElementById(selectId);
-        select.innerHTML = '<option value="">Select Subject</option>';
-
-        subjects.forEach(subject => {
-            const option = document.createElement("option");
-            option.value = subject.id;
-            option.textContent = `${subject.name} (${subject.code})`;
-            select.appendChild(option);
-        });
-    });
-}
-
-function showAttendanceForm() {
-    editingAttendanceId = null;
-    document.getElementById("attendanceForm").reset();
-    document.getElementById("formTitle").textContent = "Mark Attendance";
-
-    document.getElementById("student").disabled = false;
-    document.getElementById("subject").disabled = false;
-
-    document.getElementById("attendanceDate").value =
-        new Date().toLocaleDateString("en-CA");
-
-    document.getElementById("attendanceFormContainer").style.display = "block";
-    document.getElementById("attendanceMessage").textContent = "";
-}
-
-function hideAttendanceForm() {
-    document.getElementById("attendanceFormContainer").style.display = "none";
-    document.getElementById("attendanceForm").reset();
-    document.getElementById("student").disabled = false;
-    document.getElementById("subject").disabled = false;
-    editingAttendanceId = null;
-}
-
-async function loadAttendance() {
-    const subjectId = document.getElementById("filterSubject").value;
-    const tbody = document.getElementById("attendanceTableBody");
-    const percentageContainer =
-        document.getElementById("percentageContainer");
-
-    percentageContainer.textContent = "";
-
-    if (!subjectId) {
-        tbody.innerHTML =
-            "<tr><td colspan='6'>Please select a subject.</td></tr>";
-        return;
-    }
-
-    tbody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
-
-    try {
-        const records = await fetchJson(
-            `/api/attendance/subject/${subjectId}`
-        );
-
+    // Render attendance records based on the selected filter
+    function renderAttendanceTable() {
+        const tbody = document.getElementById("attendanceTable");
         tbody.innerHTML = "";
 
-        if (records.length === 0) {
+        const filteredRecords = allAttendanceRecords.filter(record => {
+            if (currentFilter === "PRESENT") return record.present;
+            if (currentFilter === "ABSENT") return !record.present;
+            return true;
+        });
+
+        if (filteredRecords.length === 0) {
             tbody.innerHTML =
-                "<tr><td colspan='6'>No attendance records found.</td></tr>";
+                "<tr><td colspan='3'>No matching attendance records.</td></tr>";
             return;
         }
 
-        records.forEach(record => {
-            const row = document.createElement("tr");
+        filteredRecords
+            .slice()
+            .sort((a, b) =>
+                b.attendanceDate.localeCompare(a.attendanceDate)
+            )
+            .forEach(record => {
+                const row = document.createElement("tr");
 
-            const values = [
-                record.id,
-                record.studentName,
-                `${record.subjectName} (${record.subjectCode})`,
-                record.attendanceDate,
-                record.present ? "Present" : "Absent"
-            ];
+                const subjectCell = document.createElement("td");
+                subjectCell.textContent = record.subjectName;
 
-            values.forEach(value => {
-                const cell = document.createElement("td");
-                cell.textContent = value ?? "";
-                row.appendChild(cell);
+                const dateCell = document.createElement("td");
+                dateCell.textContent = record.attendanceDate;
+
+                const statusCell = document.createElement("td");
+                statusCell.textContent = record.present ? "Present" : "Absent";
+                statusCell.className = record.present ? "present" : "absent";
+
+                row.append(subjectCell, dateCell, statusCell);
+                tbody.appendChild(row);
             });
+    }
 
-            const actions = document.createElement("td");
+    // Load attendance records from the backend
+    async function loadAttendance() {
+        const tbody = document.getElementById("attendanceTable");
+        const message = document.getElementById("message");
 
-            const editButton = document.createElement("button");
-            editButton.textContent = "Edit";
-            editButton.onclick = () => editAttendance(record);
-
-            actions.appendChild(editButton);
-
-            const percentageButton = document.createElement("button");
-            percentageButton.textContent = "Percentage";
-            percentageButton.onclick = () =>
-                showPercentage(record.studentId, record.subjectId);
-
-            actions.appendChild(percentageButton);
-
-            if (role === "ADMIN") {
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Delete";
-                deleteButton.onclick = () => deleteAttendance(record.id);
-                actions.appendChild(deleteButton);
-            }
-
-            row.appendChild(actions);
-            tbody.appendChild(row);
-        });
-    } catch (error) {
-        console.error(error);
         tbody.innerHTML =
-            "<tr><td colspan='6'>Could not load attendance.</td></tr>";
-    }
-}
-
-async function showPercentage(studentId, subjectId) {
-    try {
-        const percentage = await fetchJson(
-            `/api/attendance/student/${studentId}/subject/${subjectId}/percentage`
-        );
-
-        alert(`Attendance Percentage: ${Number(percentage).toFixed(2)}%`);
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
-}
-
-function editAttendance(record) {
-    editingAttendanceId = record.id;
-
-    document.getElementById("formTitle").textContent = "Edit Attendance";
-    document.getElementById("student").value = record.studentId;
-    document.getElementById("subject").value = record.subjectId;
-    document.getElementById("attendanceDate").value = record.attendanceDate;
-    document.getElementById("present").value = String(record.present);
-
-    // The existing backend update endpoint changes the record by ID.
-    // Student and subject are kept unchanged during editing.
-    document.getElementById("student").disabled = true;
-    document.getElementById("subject").disabled = true;
-
-    document.getElementById("attendanceFormContainer").style.display = "block";
-    document.getElementById("attendanceMessage").textContent = "";
-}
-
-document.getElementById("attendanceForm").addEventListener(
-    "submit",
-    async function(event) {
-        event.preventDefault();
-
-        const studentId = document.getElementById("student").value;
-        const subjectId = document.getElementById("subject").value;
-        const attendanceDate =
-            document.getElementById("attendanceDate").value;
-        const present =
-            document.getElementById("present").value === "true";
-
-        const attendance = { attendanceDate, present };
+            "<tr><td colspan='3'>Loading attendance...</td></tr>";
 
         try {
-            let url;
-            let method;
+            const response = await fetch(
+                `/api/attendance/student/${studentId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: "application/json"
+                    }
+                }
+            );
 
-            if (editingAttendanceId !== null) {
-                url = `/api/attendance/${editingAttendanceId}`;
-                method = "PUT";
-            } else {
-                url = `/api/attendance?studentId=${studentId}&subjectId=${subjectId}`;
-                method = "POST";
+            if (!response.ok) {
+                throw new Error(
+                    `Failed to load attendance (${response.status})`
+                );
             }
 
-            await fetchJson(url, {
-                method,
-                body: JSON.stringify(attendance)
+            const records = await response.json();
+            allAttendanceRecords = records;
+
+            // Calculate overall attendance
+            const classesAttended =
+                records.filter(record => record.present).length;
+            const totalClasses = records.length;
+
+            const percentage = totalClasses === 0
+                ? 0
+                : (classesAttended / totalClasses) * 100;
+
+            document.getElementById("overallPercentage").textContent =
+                `${percentage.toFixed(2)}%`;
+
+            document.getElementById("classesAttended").textContent =
+                classesAttended;
+
+            document.getElementById("totalClasses").textContent =
+                totalClasses;
+
+            // Calculate subject-wise attendance
+            const subjectSummary =
+                document.getElementById("subjectSummary");
+
+            subjectSummary.innerHTML = "";
+
+            const subjects = {};
+
+            records.forEach(record => {
+                if (!subjects[record.subjectId]) {
+                    subjects[record.subjectId] = {
+                        name: record.subjectName,
+                        attended: 0,
+                        total: 0
+                    };
+                }
+
+                subjects[record.subjectId].total++;
+
+                if (record.present) {
+                    subjects[record.subjectId].attended++;
+                }
             });
 
-            document.getElementById("attendanceMessage").textContent =
-                editingAttendanceId !== null
-                    ? "Attendance updated successfully!"
-                    : "Attendance marked successfully!";
+            Object.values(subjects).forEach(subject => {
+                const subjectPercentage =
+                    (subject.attended / subject.total) * 100;
 
-            const selectedSubject =
-                editingAttendanceId !== null
-                    ? document.getElementById("subject").value
-                    : subjectId;
+                const card = document.createElement("div");
+                card.className = "subject-card";
 
-            hideAttendanceForm();
+                const heading = document.createElement("h4");
+                heading.textContent = subject.name;
 
-            document.getElementById("filterSubject").value =
-                selectedSubject;
+                const details = document.createElement("p");
+                details.textContent =
+                    `${subjectPercentage.toFixed(2)}% · ` +
+                    `${subject.attended} of ${subject.total} classes attended`;
 
-            await loadAttendance();
+                const progress = document.createElement("div");
+                progress.className = "subject-progress";
+
+                const fill = document.createElement("div");
+                fill.className = "subject-progress-fill";
+                fill.style.width = `${subjectPercentage}%`;
+
+                progress.appendChild(fill);
+                card.append(heading, details, progress);
+                subjectSummary.appendChild(card);
+            });
+
+            // Handle no attendance records
+            if (records.length === 0) {
+                subjectSummary.textContent =
+                    "No subject attendance records found.";
+            }
+
+            // Render table using the currently selected filter
+            renderAttendanceTable();
+
+            message.textContent =
+                `${records.length} attendance record(s) found.`;
+
         } catch (error) {
             console.error(error);
-            document.getElementById("attendanceMessage").textContent =
-                error.message;
+
+            tbody.innerHTML =
+                "<tr><td colspan='3'>Unable to load attendance.</td></tr>";
+
+            message.textContent =
+                "Please try again later.";
+
+            document.getElementById("subjectSummary").textContent =
+                "Unable to load subject attendance.";
+
+            document.getElementById("overallPercentage").textContent = "--%";
+            document.getElementById("classesAttended").textContent = "--";
+            document.getElementById("totalClasses").textContent = "--";
         }
     }
-);
 
-async function deleteAttendance(id) {
-    if (role !== "ADMIN") {
-        alert("Only Admin can delete attendance records.");
-        return;
-    }
+    // Set up All, Present and Absent filter buttons
+    document.querySelectorAll(".filter-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            currentFilter = button.dataset.filter;
 
-    if (!confirm("Are you sure you want to delete this attendance record?")) {
-        return;
-    }
+            document.querySelectorAll(".filter-btn").forEach(btn => {
+                btn.classList.toggle("active", btn === button);
+            });
 
-    try {
-        await fetchJson(`/api/attendance/${id}`, {
-            method: "DELETE"
+            renderAttendanceTable();
         });
+    });
 
-        alert("Attendance deleted successfully!");
-        await loadAttendance();
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
+    // Initial page load
+    loadAttendance();
 }
-
-function logout() {
-    localStorage.clear();
-    window.location.href = "login.html";
-}
-
-async function initializePage() {
-    try {
-        await Promise.all([loadStudents(), loadSubjects()]);
-    } catch (error) {
-        console.error(error);
-        document.getElementById("attendanceMessage").textContent =
-            error.message;
-    }
-}
-
-initializePage();

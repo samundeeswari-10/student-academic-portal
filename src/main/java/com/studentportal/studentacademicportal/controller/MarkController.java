@@ -1,3 +1,4 @@
+
 package com.studentportal.studentacademicportal.controller;
 
 import com.studentportal.studentacademicportal.dto.MarkResponse;
@@ -19,6 +20,7 @@ public class MarkController {
         this.markService = markService;
     }
 
+    // Create marks
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
     public ResponseEntity<MarkResponse> createMark(
@@ -26,53 +28,63 @@ public class MarkController {
             @RequestParam Long subjectId,
             @RequestBody Mark mark) {
 
-        Mark saved =
-                markService.createMark(
-                        studentId,
-                        subjectId,
-                        mark
-                );
+        Mark saved = markService.createMark(
+                studentId,
+                subjectId,
+                mark
+        );
 
         return ResponseEntity.ok(toResponse(saved));
     }
 
+    // Get marks by student
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<MarkResponse>> getStudentMarks(
             @PathVariable Long studentId) {
 
-        List<MarkResponse> marks =
-                markService
-                        .getMarksByStudent(studentId)
-                        .stream()
-                        .map(this::toResponse)
-                        .toList();
+        List<MarkResponse> marks = markService
+                .getMarksByStudent(studentId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
 
         return ResponseEntity.ok(marks);
     }
 
+    // Get marks by subject
     @GetMapping("/subject/{subjectId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
     public ResponseEntity<List<MarkResponse>> getSubjectMarks(
             @PathVariable Long subjectId) {
 
-        List<MarkResponse> marks =
-                markService
-                        .getMarksBySubject(subjectId)
-                        .stream()
-                        .map(this::toResponse)
-                        .toList();
+        List<MarkResponse> marks = markService
+                .getMarksBySubject(subjectId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
 
         return ResponseEntity.ok(marks);
     }
 
+    // Get mark by ID
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
+    public ResponseEntity<MarkResponse> getMarkById(
+            @PathVariable Long id) {
+
+        return markService.getMarkById(id)
+                .map(mark -> ResponseEntity.ok(toResponse(mark)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // Update marks
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FACULTY')")
     public ResponseEntity<MarkResponse> updateMark(
             @PathVariable Long id,
             @RequestBody Mark mark) {
 
-        Mark updated =
-                markService.updateMark(id, mark);
+        Mark updated = markService.updateMark(id, mark);
 
         if (updated == null) {
             return ResponseEntity.notFound().build();
@@ -81,13 +93,13 @@ public class MarkController {
         return ResponseEntity.ok(toResponse(updated));
     }
 
+    // Delete marks
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteMark(
             @PathVariable Long id) {
 
-        boolean deleted =
-                markService.deleteMark(id);
+        boolean deleted = markService.deleteMark(id);
 
         if (!deleted) {
             return ResponseEntity.notFound().build();
@@ -96,7 +108,23 @@ public class MarkController {
         return ResponseEntity.noContent().build();
     }
 
+    // Convert Mark entity into MarkResponse DTO
     private MarkResponse toResponse(Mark mark) {
+
+        double catAverage =
+                markService.calculateCatAverage(mark);
+
+        double assignmentAverage =
+                markService.calculateAssignmentAverage(mark);
+
+        double internalTotal =
+                markService.calculateInternalTotal(mark);
+
+        double finalExamConverted =
+                markService.calculateFinalExamConverted(mark);
+
+        double overallTotal =
+                markService.calculateOverallTotal(mark);
 
         return new MarkResponse(
                 mark.getId(),
@@ -108,9 +136,21 @@ public class MarkController {
                 mark.getSubject().getName(),
                 mark.getSubject().getCode(),
 
-                mark.getInternalMarks(),
-                mark.getAssignmentMarks(),
-                mark.getExamMarks()
+                mark.getCat1(),
+                mark.getCat2(),
+                mark.getCat3(),
+
+                mark.getAssignment1(),
+                mark.getAssignment2(),
+                mark.getAssignment3(),
+
+                mark.getFinalExam(),
+
+                catAverage,
+                assignmentAverage,
+                internalTotal,
+                finalExamConverted,
+                overallTotal
         );
     }
 }
